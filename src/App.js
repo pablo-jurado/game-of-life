@@ -39,16 +39,16 @@ class App extends Component {
 
 function Board(props) {
   var rows = props.board.map(function(row, idx) {
-    return <Row row={row} />
+    return <Row key={idx} row={row} />
   })
   return rows
 }
 
 function Row(props) {
-  var row = props.row.map(function(item, idx) {
+  var boxes = props.row.map(function(item, idx) {
     return <Box key={idx} />
   })
-  return <div className="row">{row}</div>;
+  return <div className="row">{boxes}</div>;
 }
 
 function Box() {
