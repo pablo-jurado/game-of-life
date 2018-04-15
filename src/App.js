@@ -22,16 +22,17 @@ class App extends Component {
     super() 
 
     this.state = {
+      gameOn: false,
       board: makeBoard(10, 10)
     };
 
-    this.setTolive = this.setTolive.bind(this);
+    this.updateBoard = this.updateBoard.bind(this);
   }
 
-  setTolive(x, y) {
+  updateBoard(x, y) {
     var newBoard = this.state.board;
     newBoard[x][y].live = !newBoard[x][y].live;
-
+  
     this.setState({ board: newBoard });
   }
 
@@ -40,7 +41,7 @@ class App extends Component {
       <div className="App">
         <h4>Game of Life</h4>
         <div className="board">
-          <Board board={ this.state.board } setTolive={this.setTolive} />
+          <Board board={ this.state.board } updateBoard={this.updateBoard} />
         </div>
       </div>
     );
@@ -49,22 +50,21 @@ class App extends Component {
 
 function Board(props) {
   var rows = props.board.map(function(row, idx) {
-    return <Row key={idx} row={row} setTolive={props.setTolive} />
+    return <Row key={idx} row={row} updateBoard={props.updateBoard} />
   })
   return rows
 }
 
 function Row(props) {
   var boxes = props.row.map(function(item, idx) {
-    return <Box key={idx} item={item} setTolive={props.setTolive} />
+    var css = "box";
+    if (item.live) css += " live";
+
+    return <div className={css} onClick={props.updateBoard.bind(null, item.x, item.y)} />;
   })
+
   return <div className="row">{boxes}</div>;
 }
 
-function Box(props) {
-  var css = "box";
-  if (props.item.live) css += " live";
-  return <div className={css} onClick={props.setTolive.bind(null, props.item.x, props.item.y)} />;
-}
 
 export default App;
