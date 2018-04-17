@@ -40,8 +40,8 @@ class App extends Component {
   updateBoard(x, y) {
     var newBoard = this.state.board;
     newBoard[x][y].live = !newBoard[x][y].live;
-  
-    this.setState({ board: newBoard });
+
+    this.setState({ board: newBoard });    
   }
 
   checkBoxesAround(boxX, boxY) {
@@ -82,14 +82,20 @@ function Board(props) {
 }
 
 function Row(props) {
-  var boxes = props.row.map(function(item, idx) {
-    var x = item.x;
-    var y = item.y;
+  var boxes = props.row.map(function(box, idx) {
+    var x = box.x;
+    var y = box.y;
     var css = "box";
-    if (item.live) css += " live";
+    if (box.live) css += " live";
     
     var result = props.checkBoxesAround(x, y)
-    if(result > 0) console.log(result);
+    
+    setTimeout(() => { if(result > 0) console.log(result); }, 1000);
+    // ***** RULES ******
+    // Any live box with fewer than two live neighbours dies, as if caused by underpopulation.
+    // Any live box with two or three live neighbours lives on to the next generation.
+    // Any live box with more than three live neighbours dies, as if by overpopulation.
+    // Any dead box with exactly three live neighbours becomes a live box, as if by reproduction.
 
     return <div key={idx} className={css} onClick={props.updateBoard.bind(null, x, y)} />;
   })
