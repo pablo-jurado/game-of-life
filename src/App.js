@@ -18,7 +18,7 @@ class App extends Component {
     this.state.board = this.makeBoard(this.state.boardX, this.state.boardY)
 
     this.makeBoard = this.makeBoard.bind(this);
-    this.updateBoard = this.updateBoard.bind(this);
+    this.toggleLive = this.toggleLive.bind(this);
     this.checkBoxesAround = this.checkBoxesAround.bind(this);
   }
   
@@ -37,7 +37,7 @@ class App extends Component {
     return board;
   }
 
-  updateBoard(x, y) {
+  toggleLive(x, y) {
     var newBoard = this.state.board;
     newBoard[x][y].live = !newBoard[x][y].live;
 
@@ -67,7 +67,7 @@ class App extends Component {
       <div className="App">
         <h4>Game of Life</h4>
         <div className="board">
-          <Board board={this.state.board} updateBoard={this.updateBoard} checkBoxesAround={this.checkBoxesAround} />
+          <Board board={this.state.board} toggleLive={this.toggleLive} checkBoxesAround={this.checkBoxesAround} />
         </div>
       </div>
     );
@@ -76,32 +76,55 @@ class App extends Component {
 
 function Board(props) {
   var rows = props.board.map(function(row, idx) {
-    return <Row key={idx} row={row} updateBoard={props.updateBoard} checkBoxesAround={props.checkBoxesAround} />
+    return <Row key={idx} row={row} toggleLive={props.toggleLive} checkBoxesAround={props.checkBoxesAround} />
   })
   return rows
 }
 
 function Row(props) {
   var boxes = props.row.map(function(box, idx) {
+    return (
+      <Box 
+        key={idx}
+        toggleLive={props.toggleLive}
+        checkBoxesAround={props.checkBoxesAround} 
+        box={box} 
+      />
+    )
+  })
+  
+  return <div className="row">{boxes}</div>;
+}
+
+class Box extends Component {
+  constructor(props) {
+    super(props) 
+  } 
+
+  render() {
+    var box = this.props.box
     var x = box.x;
     var y = box.y;
     var css = "box";
     if (box.live) css += " live";
     
-    var result = props.checkBoxesAround(x, y)
+    // var liveNeighbours = props.checkBoxesAround(x, y);
     
-    setTimeout(() => { if(result > 0) console.log(result); }, 1000);
-    // ***** RULES ******
-    // Any live box with fewer than two live neighbours dies, as if caused by underpopulation.
-    // Any live box with two or three live neighbours lives on to the next generation.
-    // Any live box with more than three live neighbours dies, as if by overpopulation.
-    // Any dead box with exactly three live neighbours becomes a live box, as if by reproduction.
-
-    return <div key={idx} className={css} onClick={props.updateBoard.bind(null, x, y)} />;
-  })
-
-  return <div className="row">{boxes}</div>;
+    // if (box.live) { 
+    //   // Any live box with fewer than two live neighbours dies, as if caused by underpopulation.
+    //   if (liveNeighbours < 2) props.toggleLive(x, y)
+      
+    //   // Any live box with two or three live neighbours lives on to the next generation.
+      
+    //   // Any live box with more than three live neighbours dies, as if by overpopulation.
+    //   if (liveNeighbours > 3) props.toggleLive(x, y)
+    // } else {
+    //   // Any dead box with exactly three live neighbours becomes a live box, as if by reproduction.
+    //   if (liveNeighbours === 3) props.toggleLive(x, y)
+    // }
+    
+    return <div className={css} onClick={this.props.toggleLive.bind(null, x, y)} />;
+  }
 }
-
 
 export default App;
