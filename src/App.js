@@ -97,9 +97,32 @@ function Row(props) {
 }
 
 class Box extends Component {
-  constructor(props) {
-    super(props) 
-  } 
+  componentWillUpdate() {
+    var x = this.props.box.x
+    var y = this.props.box.y
+    var liveNeighbours = this.props.checkBoxesAround(x, y);
+    
+    // Any live box with two or three live neighbours lives on to the next generation.
+    if (this.props.box.live) {
+      // Any live box with fewer than two live neighbours dies, as if caused by underpopulation.
+      if (liveNeighbours < 2) {
+        // this.props.toggleLive(x, y)
+        console.log("liveNeighbours < 2")
+      }
+      
+      // Any live box with more than three live neighbours dies, as if by overpopulation.
+      if (liveNeighbours > 3) {
+        // this.props.toggleLive(x, y)
+        console.log("liveNeighbours > 3");
+      }  
+    } else {
+      // Any dead box with exactly three live neighbours becomes a live box, as if by reproduction.
+      if (liveNeighbours === 3) {
+        // this.props.toggleLive(x, y)
+        console.log("liveNeighbours > 3");
+      }
+    }
+  }
 
   render() {
     var box = this.props.box
@@ -107,22 +130,7 @@ class Box extends Component {
     var y = box.y;
     var css = "box";
     if (box.live) css += " live";
-    
-    // var liveNeighbours = props.checkBoxesAround(x, y);
-    
-    // if (box.live) { 
-    //   // Any live box with fewer than two live neighbours dies, as if caused by underpopulation.
-    //   if (liveNeighbours < 2) props.toggleLive(x, y)
-      
-    //   // Any live box with two or three live neighbours lives on to the next generation.
-      
-    //   // Any live box with more than three live neighbours dies, as if by overpopulation.
-    //   if (liveNeighbours > 3) props.toggleLive(x, y)
-    // } else {
-    //   // Any dead box with exactly three live neighbours becomes a live box, as if by reproduction.
-    //   if (liveNeighbours === 3) props.toggleLive(x, y)
-    // }
-    
+        
     return <div className={css} onClick={this.props.toggleLive.bind(null, x, y)} />;
   }
 }
