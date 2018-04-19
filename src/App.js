@@ -6,20 +6,27 @@ import _ from 'lodash';
 
 class App extends Component {
   constructor() {
-    super() 
+    super()
 
     this.state = {
+      gameOn: false,
       boardX: 10,
       boardY: 10,
       gameOn: false,
       board: null
     };
 
-    this.state.board = this.makeBoard(this.state.boardX, this.state.boardY)
+    this.prevBoard = this.makeBoard(this.state.boardX, this.state.boardY);
+    this.state.board = this.prevBoard;
+    this.intervalId = null;
 
-    this.makeBoard = this.makeBoard.bind(this);
-    this.toggleLive = this.toggleLive.bind(this);
     this.checkBoxesAround = this.checkBoxesAround.bind(this);
+    this.toggleLive = this.toggleLive.bind(this);
+    this.makeBoard = this.makeBoard.bind(this);
+    this.clickBox = this.clickBox.bind(this);
+    this.reRender = this.reRender.bind(this);
+    this.play = this.play.bind(this);
+    this.stop = this.stop.bind(this);
   }
   
   makeBoard(maxRow, maxCol) {
@@ -38,10 +45,30 @@ class App extends Component {
   }
 
   toggleLive(x, y) {
+    this.prevBoard[x][y].live = !this.prevBoard[x][y].live;
+  }
+
+  clickBox(x, y) {
     var newBoard = this.state.board;
     newBoard[x][y].live = !newBoard[x][y].live;
 
     this.setState({ board: newBoard });    
+  }
+
+  play() {
+    this.stop();
+    this.intervalId = setInterval(this.reRender, 1000);
+    this.setState({ gameOn: true });
+  }
+
+  stop() {
+    this.setState({ gameOn: false });    
+    clearInterval(this.intervalId);
+  }
+
+  reRender() {
+    console.log("render!!!");
+    this.setState({ board: this.prevBoard });    
   }
 
   checkBoxesAround(boxX, boxY) {
@@ -67,26 +94,46 @@ class App extends Component {
       <div className="App">
         <h4>Game of Life</h4>
         <div className="board">
-          <Board board={this.state.board} toggleLive={this.toggleLive} checkBoxesAround={this.checkBoxesAround} />
+          <Board
+            gameOn={this.state.gameOn}
+            board={this.state.board}
+            toggleLive={this.toggleLive}
+            clickBox={this.clickBox}
+            checkBoxesAround={this.checkBoxesAround}
+          />
         </div>
+        <br />
+        <button type="button" onClick={this.play}>Play</button>
+        <button type="button" onClick={this.stop}>Stop</button>
+
       </div>
     );
   }
 }
 
 function Board(props) {
-  var rows = props.board.map(function(row, idx) {
-    return <Row key={idx} row={row} toggleLive={props.toggleLive} checkBoxesAround={props.checkBoxesAround} />
+  var rows = props.board.map((row, idx) => {
+    return (
+      <Row key={idx}
+        row={row}
+        gameOn={props.gameOn}
+        toggleLive={props.toggleLive}
+        clickBox={props.clickBox}
+        checkBoxesAround={props.checkBoxesAround}
+      />
+    )  
   })
   return rows
 }
 
 function Row(props) {
-  var boxes = props.row.map(function(box, idx) {
+  var boxes = props.row.map((box, idx) => {
     return (
       <Box 
         key={idx}
+        gameOn={props.gameOn}
         toggleLive={props.toggleLive}
+        clickBox={props.clickBox}
         checkBoxesAround={props.checkBoxesAround} 
         box={box} 
       />
@@ -97,41 +144,39 @@ function Row(props) {
 }
 
 class Box extends Component {
-  componentWillUpdate() {
-    var x = this.props.box.x
-    var y = this.props.box.y
-    var liveNeighbours = this.props.checkBoxesAround(x, y);
-    
-    // Any live box with two or three live neighbours lives on to the next generation.
-    if (this.props.box.live) {
-      // Any live box with fewer than two live neighbours dies, as if caused by underpopulation.
-      if (liveNeighbours < 2) {
-        // this.props.toggleLive(x, y)
-        console.log("liveNeighbours < 2")
-      }
-      
-      // Any live box with more than three live neighbours dies, as if by overpopulation.
-      if (liveNeighbours > 3) {
-        // this.props.toggleLive(x, y)
-        console.log("liveNeighbours > 3");
-      }  
-    } else {
-      // Any dead box with exactly three live neighbours becomes a live box, as if by reproduction.
-      if (liveNeighbours === 3) {
-        // this.props.toggleLive(x, y)
-        console.log("liveNeighbours > 3");
-      }
-    }
-  }
-
   render() {
     var box = this.props.box
     var x = box.x;
     var y = box.y;
     var css = "box";
     if (box.live) css += " live";
+
+    var liveNeighbours = this.props.checkBoxesAround(x, y);
+
+    if (this.props.gameOn) {
+      // Any live box with two or three live neighbours lives on to the next generation.
+      if (this.props.box.live) {
+        // Any live box with fewer than two live neighbours dies, as if caused by underpopulation.
+        if (liveNeighbours < 2) {
+          this.props.toggleLive(x, y)
+          console.log("liveNeighbours < 2")
+        }
         
-    return <div className={css} onClick={this.props.toggleLive.bind(null, x, y)} />;
+        // Any live box with more than three live neighbours dies, as if by overpopulation.
+        if (liveNeighbours > 3) {
+          this.props.toggleLive(x, y)
+          console.log("liveNeighbours > 3");
+        }  
+      } else {
+        // Any dead box with exactly three live neighbours becomes a live box, as if by reproduction.
+        if (liveNeighbours === 3) {
+          this.props.toggleLive(x, y)
+          console.log("liveNeighbours > 3");
+        }
+      }
+    }
+      
+    return <div className={css} onClick={this.props.clickBox.bind(null, x, y)} />;
   }
 }
 
