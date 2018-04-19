@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-import _ from 'lodash';
-
 
 
 class App extends Component {
@@ -12,7 +10,6 @@ class App extends Component {
       gameOn: false,
       boardX: 10,
       boardY: 10,
-      gameOn: false,
       board: null
     };
 
@@ -67,7 +64,6 @@ class App extends Component {
   }
 
   reRender() {
-    console.log("render!!!");
     this.setState({ board: this.prevBoard });    
   }
 
@@ -139,7 +135,7 @@ function Row(props) {
       />
     )
   })
-  
+
   return <div className="row">{boxes}</div>;
 }
 
@@ -159,19 +155,16 @@ class Box extends Component {
         // Any live box with fewer than two live neighbours dies, as if caused by underpopulation.
         if (liveNeighbours < 2) {
           this.props.toggleLive(x, y)
-          console.log("liveNeighbours < 2")
         }
         
         // Any live box with more than three live neighbours dies, as if by overpopulation.
         if (liveNeighbours > 3) {
           this.props.toggleLive(x, y)
-          console.log("liveNeighbours > 3");
         }  
       } else {
         // Any dead box with exactly three live neighbours becomes a live box, as if by reproduction.
         if (liveNeighbours === 3) {
           this.props.toggleLive(x, y)
-          console.log("liveNeighbours > 3");
         }
       }
     }
