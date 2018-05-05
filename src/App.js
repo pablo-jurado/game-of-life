@@ -24,6 +24,7 @@ class App extends Component {
     this.play = this.play.bind(this);
     this.pause = this.pause.bind(this);
     this.clear = this.clear.bind(this);
+    this.seed = this.seed.bind(this);
   }
   
   makeBoard(maxRow, maxCol) {
@@ -63,6 +64,20 @@ class App extends Component {
   pause() {
     this.setState({ gameOn: false });    
     clearInterval(this.intervalId);
+  }
+
+  seed() {
+    var newBoard = this.state.board;
+    var maxRow = this.state.boardX;
+    var maxCol = this.state.boardY;
+    for (let indexRow = 0; indexRow < maxRow; indexRow++) {
+      for (let indexCol = 0; indexCol < maxCol; indexCol++) {
+        var num = Math.random();
+        var randomBoolean = (num > 0.5) ? true : false;
+        newBoard[indexRow][indexCol].live = randomBoolean; 
+      }
+    }
+    this.setState({ board: newBoard});
   }
   
   reRender() {
@@ -129,6 +144,7 @@ class App extends Component {
           />
         </div>
         <br />
+        <button type="button" onClick={this.seed}>Seed</button>
         <button type="button" onClick={this.play}>Play</button>
         <button type="button" onClick={this.pause}>Pause</button>
         <button type="button" onClick={this.clear}>Clear</button>
