@@ -22,7 +22,8 @@ class App extends Component {
     this.clickBox = this.clickBox.bind(this);
     this.reRender = this.reRender.bind(this);
     this.play = this.play.bind(this);
-    this.stop = this.stop.bind(this);
+    this.pause = this.pause.bind(this);
+    this.clear = this.clear.bind(this);
   }
   
   makeBoard(maxRow, maxCol) {
@@ -48,16 +49,22 @@ class App extends Component {
   }
 
   play() {
-    this.stop();
+    clearInterval(this.intervalId);
     this.intervalId = setInterval(this.reRender, 1000);
     this.setState({ gameOn: true });
   }
 
-  stop() {
+  clear() {
+    var newBoard = this.makeBoard(this.state.boardX, this.state.boardY);
+    clearInterval(this.intervalId);
+    this.setState({ gameOn: false, board: newBoard, renderCount: 0 });
+  }
+  
+  pause() {
     this.setState({ gameOn: false });    
     clearInterval(this.intervalId);
   }
-
+  
   reRender() {
     var currentBoard = this.state.board;
     var nextBoard = deepClone(this.state.board);
@@ -123,7 +130,8 @@ class App extends Component {
         </div>
         <br />
         <button type="button" onClick={this.play}>Play</button>
-        <button type="button" onClick={this.stop}>Stop</button>
+        <button type="button" onClick={this.pause}>Pause</button>
+        <button type="button" onClick={this.clear}>Clear</button>
 
       </div>
     );
