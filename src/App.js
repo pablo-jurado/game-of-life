@@ -9,8 +9,9 @@ class App extends Component {
     this.state = {
       renderCount: 0,
       gameOn: false,
-      boardX: 10,
-      boardY: 10,
+      size: "Small",
+      boardX: 25,
+      boardY: 25,
       board: null
     };
 
@@ -18,6 +19,7 @@ class App extends Component {
     this.intervalId = null;
 
     this.checkBoxesAround = this.checkBoxesAround.bind(this);
+    this.handleSizeChange = this.handleSizeChange.bind(this);
     this.makeBoard = this.makeBoard.bind(this);
     this.clickBox = this.clickBox.bind(this);
     this.reRender = this.reRender.bind(this);
@@ -79,6 +81,29 @@ class App extends Component {
     }
     this.setState({ board: newBoard});
   }
+
+  handleSizeChange(e) {
+    var value = e.target.value;
+    var x = 20;
+    var y = 20;
+
+    if (value === "Medium") {
+      x = 35;
+      y = 35;
+    }
+
+    if (value === "Large") {
+      x = 50;
+      y = 50;
+    }
+
+    this.setState({
+      size: value,
+      boardX: x,
+      boardY: y,
+      board: this.makeBoard(x, y)
+    });
+  }
   
   reRender() {
     var currentBoard = this.state.board;
@@ -136,6 +161,7 @@ class App extends Component {
       <div className="App">
         <h4>Game of Life</h4>
         <p>Generation: {this.state.renderCount}</p>
+        <SelectSize size={this.state.size} handleSizeChange={this.handleSizeChange} />
         <div className="board">
           <Board
             gameOn={this.state.gameOn}
@@ -152,6 +178,20 @@ class App extends Component {
       </div>
     );
   }
+}
+
+function SelectSize(props) {
+  return (
+    <div>
+      <label>Board Size: </label>
+      <select value={props.size} onChange={props.handleSizeChange}>
+        <option value="Small">Small</option>
+        <option value="Medium">Medium</option>
+        <option value="Large">Large</option>
+      </select>
+      <br /><br />
+    </div>
+  );
 }
 
 function deepClone(element) {
