@@ -8,15 +8,19 @@ class App extends Component {
 
     this.state = {
       renderCount: 0,
-      gameOn: false,
       sizeValue: "Small",
       size: {
         Small: 20,
         Medium: 35,
         Large: 50
       },
-      boardX: 25,
-      boardY: 25,
+      speedValue: "Slow",
+      speed: {
+        Slow: 800,
+        Fast: 200,
+      },
+      boardX: 20,
+      boardY: 20,
       board: null
     };
 
@@ -25,6 +29,7 @@ class App extends Component {
 
     this.checkBoxesAround = this.checkBoxesAround.bind(this);
     this.handleSizeChange = this.handleSizeChange.bind(this);
+    this.handleSpeedChange = this.handleSpeedChange.bind(this);
     this.makeBoard = this.makeBoard.bind(this);
     this.clickBox = this.clickBox.bind(this);
     this.reRender = this.reRender.bind(this);
@@ -58,18 +63,17 @@ class App extends Component {
 
   play() {
     clearInterval(this.intervalId);
-    this.intervalId = setInterval(this.reRender, 1000);
-    this.setState({ gameOn: true });
+    var time = this.state.speed[this.state.speedValue];
+    this.intervalId = setInterval(this.reRender, time);
   }
 
   clear() {
     var newBoard = this.makeBoard(this.state.boardX, this.state.boardY);
     clearInterval(this.intervalId);
-    this.setState({ gameOn: false, board: newBoard, renderCount: 0 });
+    this.setState({ board: newBoard, renderCount: 0 });
   }
   
   pause() {
-    this.setState({ gameOn: false });    
     clearInterval(this.intervalId);
   }
 
@@ -96,6 +100,10 @@ class App extends Component {
       boardY: value,
       board: this.makeBoard(value, value)
     });
+  }
+
+  handleSpeedChange(e) {
+    this.setState({ speedValue: e.target.value });
   }
   
   reRender() {
@@ -155,9 +163,9 @@ class App extends Component {
         <h4>Game of Life</h4>
         <p>Generation: {this.state.renderCount}</p>
         <SelectSize size={this.state.sizeValue} handleSizeChange={this.handleSizeChange} />
+        <SelectSpeed size={this.state.speedValue} handleSpeedChange={this.handleSpeedChange} />
         <div className="board">
           <Board
-            gameOn={this.state.gameOn}
             board={this.state.board}
             clickBox={this.clickBox}
           />
@@ -182,7 +190,18 @@ function SelectSize(props) {
         <option value="Medium">Medium</option>
         <option value="Large">Large</option>
       </select>
-      <br /><br />
+    </div>
+  );
+}
+
+function SelectSpeed(props) {
+  return (
+    <div>
+      <label>Speed: </label>
+      <select value={props.speedValue} onChange={props.handleSpeedChange}>
+        <option value="Slow">Slow</option>
+        <option value="Fast">Fast</option>
+      </select>
     </div>
   );
 }
@@ -196,7 +215,6 @@ function Board(props) {
     return (
       <Row key={idx}
         row={row}
-        gameOn={props.gameOn}
         clickBox={props.clickBox}
       />
     )  
@@ -209,7 +227,6 @@ function Row(props) {
     return (
       <Box 
         key={idx}
-        gameOn={props.gameOn}
         clickBox={props.clickBox}
         box={box} 
       />
