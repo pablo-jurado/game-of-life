@@ -1,7 +1,6 @@
 # Game of LIfe
 
-> work in progress
-
+[link](http://game-of-life-pablo.surge.sh/)
 
 ## Rules: 
 
